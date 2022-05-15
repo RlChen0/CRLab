@@ -15,20 +15,20 @@ class PearsonR(Metric):
         self.add_state('pred_sum', default=torch.zeros(self._shape), dist_reduce_fx=None)
         self.add_state('pred_sumsq', default=torch.zeros(self._shape), dist_reduce_fx=None)
 
-    def update(self, pred: torch.Tensor, target: torch.Tensor):
-        assert pred.shape == target.shape
+    def update(self, pred: torch.Tensor, true: torch.Tensor):
+        assert pred.shape == true.shape
 
-        if len(target.shape) == 2:
+        if len(true.shape) == 2:
             reduce_dim = 1
         else:
             reduce_dim = [0, 2]
-        product = torch.sum(torch.mul(pred, target), dim=reduce_dim)
+        product = torch.sum(torch.mul(pred, true), dim=reduce_dim)
         self.product += product
 
-        true_sum = torch.sum(target, dim=reduce_dim)
+        true_sum = torch.sum(true, dim=reduce_dim)
         self.true_sum += true_sum
 
-        true_sumsq = torch.sum(torch.square(target), dim=reduce_dim)
+        true_sumsq = torch.sum(torch.square(true), dim=reduce_dim)
         self.true_sumsq += true_sumsq
 
         pred_sum = torch.sum(pred, dim=reduce_dim)
@@ -37,7 +37,7 @@ class PearsonR(Metric):
         pred_sumsq = torch.sum(torch.square(pred), dim=reduce_dim)
         self.pred_sumsq += pred_sumsq
 
-        count = torch.ones_like(target)
+        count = torch.ones_like(true)
         count = torch.sum(count, dim=reduce_dim)
         self.count += count
 
@@ -70,4 +70,58 @@ class PearsonR(Metric):
 
 
 class R2(Metric):
-    def __init__(self,num_targets, dist_sync_on_step=False, summarize=True, )
+    def __init__(self, num_targets, dist_sync_on_step=False, summarize=True):
+        super(R2, self).__init__(dist_sync_on_step=dist_sync_on_step)
+        self._summarize = summarize
+        self._shape = (num_targets, )
+
+        self.add_state('count', default=torch.zeros(self._shape), dist_reduce_fx=None)
+
+        self.add_state('true_sum', default=torch.zeros(self._shape), dist_reduce_fx=None)
+        self.add_state('true_sumsq', default=torch.zeros(self._shape), dist_reduce_fx=None)
+
+        self.add_state('product', default=torch.zeros(self._shape), dist_reduce_fx=None)
+        self.add_state('pred_sumsq', default=torch.zeros(self._shape), dist_reduce_fx=None)
+
+    def update(self, pred: torch.Tensor, true: torch.Tensor, sample_weight=None):
+
+        if len(true.shape) == 2:
+            reduce_dim = 1
+        else:
+            reduce_dim = [0, 2]
+
+        true_sum = torch.sum(true, dim=reduce_dim)
+        self.true_sum += true_sum
+
+        true_sumsq = torch.sum(torch.square(true), dim=reduce_dim)
+        self.true_sum += true_sumsq
+
+        product = torch.sum(torch.mul(true, pred), dim=reduce_dim)
+        self.product += product
+
+        pred_sumsq = torch.sum(torch.square(pred), dim=reduce_dim)
+        self.pred_sumsq += pred_sumsq
+
+        count = torch.ones_like(true)
+        count = torch.sum(count, dim=reduce_dim)
+        self.count += count
+
+    def compute(self):
+        true_mean = torch.div(self.true_sum, self.count)
+        true_mean2 = torch.square(true_mean)
+
+        total = self.true_sumsq - torch.mul(self.count, true_mean2)
+
+        resid1 = self.pred_sumsq
+        resid2 = -2 * self.product
+        resid3 = self.true_sumsq
+        resid = resid1 + resid2 + resid3
+
+        r2 = torch.ones_like(self._shape, dtype=torch.float32) - torch.div(resid, total)
+
+        if self._summarize:
+            return torch.mean(r2)
+        else:
+            return r2
+
+
