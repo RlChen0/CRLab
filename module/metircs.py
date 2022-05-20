@@ -2,7 +2,6 @@ import numpy as np
 import torch
 from torchmetrics import Metric
 
-
 class PearsonR(Metric):
     def __init__(self, num_targets, dist_sync_on_step=False, summarize=True):
         super(PearsonR, self).__init__(dist_sync_on_step=dist_sync_on_step)
@@ -17,11 +16,13 @@ class PearsonR(Metric):
 
     def update(self, pred: torch.Tensor, true: torch.Tensor):
         assert pred.shape == true.shape
-
+        pred = pred.to(torch.float32)
+        true = true.to(torch.float32)
         if len(true.shape) == 2:
             reduce_dim = 1
         else:
             reduce_dim = [0, 2]
+
         product = torch.sum(torch.mul(pred, true), dim=reduce_dim)
         self.product += product
 
@@ -73,8 +74,7 @@ class R2(Metric):
     def __init__(self, num_targets, dist_sync_on_step=False, summarize=True):
         super(R2, self).__init__(dist_sync_on_step=dist_sync_on_step)
         self._summarize = summarize
-        self._shape = (num_targets, )
-
+        self._shape = (num_targets,)
         self.add_state('count', default=torch.zeros(self._shape), dist_reduce_fx=None)
 
         self.add_state('true_sum', default=torch.zeros(self._shape), dist_reduce_fx=None)
@@ -84,7 +84,8 @@ class R2(Metric):
         self.add_state('pred_sumsq', default=torch.zeros(self._shape), dist_reduce_fx=None)
 
     def update(self, pred: torch.Tensor, true: torch.Tensor, sample_weight=None):
-
+        pred = pred.to(torch.float32)
+        true = true.to(torch.float32)
         if len(true.shape) == 2:
             reduce_dim = 1
         else:
@@ -94,7 +95,7 @@ class R2(Metric):
         self.true_sum += true_sum
 
         true_sumsq = torch.sum(torch.square(true), dim=reduce_dim)
-        self.true_sum += true_sumsq
+        self.true_sumsq += true_sumsq
 
         product = torch.sum(torch.mul(true, pred), dim=reduce_dim)
         self.product += product
@@ -117,11 +118,9 @@ class R2(Metric):
         resid3 = self.true_sumsq
         resid = resid1 + resid2 + resid3
 
-        r2 = torch.ones_like(self._shape, dtype=torch.float32) - torch.div(resid, total)
+        r2 = torch.ones(self._shape, dtype=torch.float32) - torch.div(resid, total)
 
         if self._summarize:
             return torch.mean(r2)
         else:
             return r2
-
-
