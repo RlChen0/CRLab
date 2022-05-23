@@ -1,6 +1,27 @@
 import numpy as np
 import torch
+import torchmetrics
 from torchmetrics import Metric
+from yacs.config import CfgNode
+from src.modeling.solvers.metrics.build import METRIC_REGISTRY
+
+
+@METRIC_REGISTRY.register('Mean')
+def build_pearsonr(metric_cfg: CfgNode):
+    metric = torchmetrics.MeanMetric()
+    return metric
+
+
+@METRIC_REGISTRY.register('Accuracy')
+def build_pearsonr(metric_cfg: CfgNode):
+    metric = torchmetrics.Accuracy()
+    return metric
+
+
+@METRIC_REGISTRY.register('R2')
+def build_pearsonr(metric_cfg: CfgNode):
+    return PearsonR(metric_cfg.NUM_TARGETS, summarize=metric_cfg.SUMMARIZE)
+
 
 class PearsonR(Metric):
     def __init__(self, num_targets, dist_sync_on_step=False, summarize=True):
@@ -68,6 +89,11 @@ class PearsonR(Metric):
             return torch.mean(correlation)
         else:
             return correlation
+
+
+@METRIC_REGISTRY.register('R2')
+def build_pearsonr(metric_cfg: CfgNode):
+    return R2(metric_cfg.NUM_TARGETS, summarize=metric_cfg.SUMMARIZE)
 
 
 class R2(Metric):

@@ -7,10 +7,10 @@ class Residual(nn.Module):
     def __init__(self, fn):
         super(Residual, self).__init__()
         self.fn = fn
-    
+
     def forward(self, x, **kwargs):
         return self.fn(x, **kwargs) + x
-    
+
 
 class GELU(nn.Module):
     def forward(self, x):

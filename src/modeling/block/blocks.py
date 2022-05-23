@@ -43,20 +43,4 @@ class ConvTower(nn.Module):
         return self.conv_tower(x)
 
 
-class ResBlock(nn.Module):
-    def __init__(self, channel_in, channel_out=None, use_1x1_conv=False, strides=1):
-        super(ResBlock, self).__init__()
-        self.conv1 = nn.Conv2d(channel_in, channel_out, kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(channel_out, channel_out, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(channel_in, channel_out, kernel_size=1, stride=strides) if use_1x1_conv else nn.Identity()
-
-        self.bn1 = nn.BatchNorm2d(channel_out)
-        self.bn2 = nn.BatchNorm2d(channel_out)
-
-    def forward(self, x):
-        inputs = x
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = self.bn2(self.conv2(x))
-        return F.relu(x + self.conv3(inputs))
-
 
