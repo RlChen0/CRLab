@@ -4,7 +4,7 @@ from yacs.config import CfgNode
 
 
 @TRANSFORM_REGISTRY.register('HorizonVerticalFlip')
-def transforms(transform_cfg: CfgNode, mode='train'):
+def build_horizon_vertical(transform_cfg: CfgNode, mode='train'):
     if mode == 'train':
         transform = t.Compose([
             t.RandomHorizontalFlip(p=transform_cfg.HORIZONTAL_FLIP_PROB),

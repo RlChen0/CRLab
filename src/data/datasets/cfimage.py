@@ -8,7 +8,7 @@ from yacs.config import CfgNode
 
 
 @DATASET_REGISTRY.register('CfImageDataset')
-def cfimagedataset(dataset_cfg: CfgNode, mode='train', transform=None, target_transform=None):
+def build_cfimagedataset(dataset_cfg: CfgNode, mode='train', transform=None, target_transform=None):
     dataset = CfImageDataset(dataset_cfg.TRAIN_DATA_ANNOTATION,
                              img_dir=dataset_cfg.DIR,
                              mode=mode,

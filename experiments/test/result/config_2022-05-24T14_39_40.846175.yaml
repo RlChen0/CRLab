@@ -1,0 +1,42 @@
+DATASET:
+  AUGMENTATION:
+    HORIZONTAL_FLIP_PROB: 0.5
+    NAME: HorizonVerticalFlip
+    VERTICAL_FLIP_PROB: 0.5
+  DIR: F:/CRLab/data/classify-leaves/
+  IMG_SIZE:
+  - 224
+  - 224
+  LOADER_WORKERS: 1
+  NAME: CfImageDataset
+  TEST_BATCH_SIZE: 64
+  TRAIN_BATCH_SIZE: 32
+  TRAIN_DATA_ANNOTATION: F:/CRLab/data/classify-leaves/train.csv
+  TSET_DATA_ANNOTATION: F:/CRLab/data/classify-leaves/test.csv
+  VALID_RATE: 0.1
+MODEL:
+  BACKBONE:
+    NAME: resnet18
+  HEAD:
+    INPUT_DIMS: 512
+    NAME: linear
+    OUTPUT_DIMS: 176
+  META_ARCHITECTURE: baseline
+OUTPUT_DIR: .\experiments\test
+RESUME_PATH: ''
+SOLVER:
+  LOSS:
+    NAME: CrossEntropyLoss
+  MAX_EPOCHS: 5
+  METRIC:
+    NAME: Accuracy
+    NUM_TARGETS: 10
+    SUMMARIZE: true
+  MIN_EPOCHS: 10
+  OPTIMIZER:
+    MOMENTUM: 0.9
+    NAME: Adam
+    TARGET_LR: 0.001
+  PATIENCE: 20
+  WARMUP_METHOD: Linear
+  WARMUP_STEPS: 500

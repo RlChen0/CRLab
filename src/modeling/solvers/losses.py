@@ -4,5 +4,5 @@ from yacs.config import CfgNode
 
 
 @LOSS_REGISTRY.register('CrossEntropyLoss')
-def cross_entropy_loss(loss_cfg: CfgNode):
+def build_cross_entropy_loss(loss_cfg: CfgNode):
     return nn.CrossEntropyLoss()

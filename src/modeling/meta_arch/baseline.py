@@ -7,8 +7,8 @@ from src.modeling.head.build import build_head
 from .build import META_ARCH_REGISTRY
 
 
-@META_ARCH_REGISTRY.register('baseline', build_model)
-def build_model(model_cfg: CfgNode) -> nn.Module:
+@META_ARCH_REGISTRY.register('baseline')
+def build_baseline_model(model_cfg: CfgNode) -> nn.Module:
     """
     Builds the baseline model using the CFGNode object,
     :param model_cfg: YAML based YACS configuration node.

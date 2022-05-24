@@ -57,14 +57,13 @@ def train(cfg: CfgNode):
 
     model = build_model(cfg.MODEL)
     use_cuda = torch.cuda.is_available()
-    train_loss = torchmetrics.MeanMetric()
-    valid_loss = torchmetrics.MeanMetric()
-    train_metrics = build_metric(cfg.METRIC)
-    valid_metrics = build_metric(cfg.METRIC)
-
     solver_cfg = cfg.SOLVER
     loss_fn = build_loss(solver_cfg.LOSS)
     updater = build_optimizer(model, solver_cfg.OPTIMIZER)
+    train_metrics = build_metric(solver_cfg.METRIC)
+    valid_metrics = build_metric(solver_cfg.METRIC)
+    train_loss = torchmetrics.MeanMetric()
+    valid_loss = torchmetrics.MeanMetric()
 
     def train_step(x, y):
         pred = model(x)
@@ -98,7 +97,7 @@ def train(cfg: CfgNode):
     if use_cuda:
         model = model.cuda()
         train_loss = train_loss.to(torch.device("cuda", 0))
-        valid_loss = valid_loss(torch.device("cuda", 0))
+        valid_loss = valid_loss.to(torch.device("cuda", 0))
         train_metrics = train_metrics.to(torch.device("cuda", 0))
         valid_metrics = valid_metrics.to(torch.device("cuda", 0))
     max_epoch = solver_cfg.MAX_EPOCHS
@@ -122,13 +121,13 @@ def train(cfg: CfgNode):
                 n_iter += 1
                 # compute computation time and *compute_efficiency*
                 process_time = start_time - time.time() - prepare_time
-                pbar.set_description("Compute efficiency: {:.2f}, epoch: {}/{}, loss: {:.5f}, accuracy: {:.5f}".format(
+                pbar.set_description("Train: Compute efficiency: {:.2f}, epoch: {}/{}, loss: {:.5f}, accuracy: {:.5f}".format(
                     process_time / (process_time + prepare_time),
                     ei, max_epoch,
                     train_loss.compute(), train_metrics.compute()))
                 start_time = time.time()
-            train_epoch_loss = train_loss.compute().numpy()
-            train_epoch_metrics = train_metrics.compute().numpy()
+            train_epoch_loss = train_loss.compute().cpu().numpy()
+            train_epoch_metrics = train_metrics.compute().cpu().numpy()
 
         check_epoch = solver_cfg.CHECK_EPOCHS
         if ei % check_epoch == check_epoch - 1:
@@ -142,12 +141,12 @@ def train(cfg: CfgNode):
                         label = label.cuda()
 
                     eval_step(img, label)
-                    pbar.set_description("epoch: {}/{}, loss: {:.5f}, accuracy: {:.5f}".format(
+                    pbar.set_description("Valid: epoch: {}/{}, loss: {:.5f}, accuracy: {:.5f}".format(
                         ei, max_epoch,
                         valid_loss.compute(), valid_metrics.compute()))
 
-            valid_epoch_loss = valid_loss.compute().numpy()
-            valid_epoch_metrics = valid_metrics.compute().numpy()
+            valid_epoch_loss = valid_loss.compute().cpu().numpy()
+            valid_epoch_metrics = valid_metrics.compute().cpu().numpy()
 
             if valid_epoch_metrics > valid_best:
                 unimproved = 0
@@ -204,6 +203,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
 

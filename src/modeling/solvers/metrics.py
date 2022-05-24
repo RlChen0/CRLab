@@ -3,22 +3,22 @@ import torch
 import torchmetrics
 from torchmetrics import Metric
 from yacs.config import CfgNode
-from src.modeling.solvers.metrics.build import METRIC_REGISTRY
+from src.modeling.solvers.build import METRIC_REGISTRY
 
 
 @METRIC_REGISTRY.register('Mean')
-def build_pearsonr(metric_cfg: CfgNode):
+def build_mean(metric_cfg: CfgNode):
     metric = torchmetrics.MeanMetric()
     return metric
 
 
 @METRIC_REGISTRY.register('Accuracy')
-def build_pearsonr(metric_cfg: CfgNode):
+def build_accuracy(metric_cfg: CfgNode):
     metric = torchmetrics.Accuracy()
     return metric
 
 
-@METRIC_REGISTRY.register('R2')
+@METRIC_REGISTRY.register('PearsonR')
 def build_pearsonr(metric_cfg: CfgNode):
     return PearsonR(metric_cfg.NUM_TARGETS, summarize=metric_cfg.SUMMARIZE)
 
@@ -92,7 +92,7 @@ class PearsonR(Metric):
 
 
 @METRIC_REGISTRY.register('R2')
-def build_pearsonr(metric_cfg: CfgNode):
+def build_r2(metric_cfg: CfgNode):
     return R2(metric_cfg.NUM_TARGETS, summarize=metric_cfg.SUMMARIZE)
 
 

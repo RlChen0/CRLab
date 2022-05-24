@@ -10,6 +10,7 @@ from pathlib import Path
 ###################################################
 _C = CN()
 cfg = _C
+
 ###################################################
 # Dataset
 ###################################################
@@ -17,10 +18,10 @@ _C.DATASET = CN()
 _C.DATASET.IMG_SIZE = (224, 224)
 _C.DATASET.DIR = 'F:/CRLab/data/classify-leaves/'
 _C.DATASET.NAME = 'CfImageDataset'
-_C.DATASET.TRAIN_DATA_ANNOTATION = 'F:/CRLab/data/classify-leave/train.csv'
+_C.DATASET.TRAIN_DATA_ANNOTATION = 'F:/CRLab/data/classify-leaves/train.csv'
 _C.DATASET.TRAIN_BATCH_SIZE = 32
 _C.DATASET.VALID_RATE = 0.1
-_C.DATASET.TSET_DATA_ANNOTATION = 'F:/CRLab/data/classify-leave/test.csv'
+_C.DATASET.TSET_DATA_ANNOTATION = 'F:/CRLab/data/classify-leaves/test.csv'
 _C.DATASET.TEST_BATCH_SIZE = 64
 
 _C.DATASET.AUGMENTATION = CN()
@@ -39,7 +40,7 @@ _C.MODEL.BACKBONE = CN()
 _C.MODEL.BACKBONE.NAME = 'resnet18'
 
 _C.MODEL.HEAD = CN()
-_C.MODEL.HEAD.NAME = 'simple_head'
+_C.MODEL.HEAD.NAME = 'linear'
 _C.MODEL.HEAD.INPUT_DIMS = 512
 _C.MODEL.HEAD.OUTPUT_DIMS = 176
 
@@ -68,8 +69,8 @@ _C.SOLVER.METRIC.NAME = 'Accuracy'
 _C.SOLVER.METRIC.NUM_TARGETS = 10
 _C.SOLVER.METRIC.SUMMARIZE = True
 ####################################################
-_C.OUTPUT_DIR = ""
-
+_C.OUTPUT_DIR = ''
+_C.RESUME_PATH = ''
 
 def get_cfg_defaults():
     """

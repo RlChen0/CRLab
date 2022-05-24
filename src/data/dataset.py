@@ -1,6 +1,6 @@
 from torch.utils import data
-from .transforms.build import build_transform
-from .datasets.build import build_dataset
+from src.data.transforms.build import build_transform
+from src.data.datasets.build import build_dataset
 from yacs.config import CfgNode
 from torch import nn
 
