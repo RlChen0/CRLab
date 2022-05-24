@@ -12,6 +12,6 @@ def build_model(model_cfg: CfgNode) -> nn.Module:
     :return: model
     """
     meta_arch = model_cfg.META_ARCHITECTURE
-    model = META_ARCH_REGISTRY.get(meta_arch)(model_cfg)
+    model = META_ARCH_REGISTRY[meta_arch](model_cfg)
 
     return model

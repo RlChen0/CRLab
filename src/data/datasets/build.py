@@ -2,7 +2,6 @@ from yacs.config import CfgNode
 from torch import nn
 from src.tools.registry import Registry
 from torch.utils.data import Dataset
-
 DATASET_REGISTRY = Registry()
 
 

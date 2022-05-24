@@ -1,7 +1,6 @@
 from yacs.config import CfgNode
 from torch import nn
 from src.tools.registry import Registry
-
 TRANSFORM_REGISTRY = Registry()
 
 

@@ -14,7 +14,7 @@ def build_dataloader(dataset_cfg: CfgNode, mode='train'):
         batch_size = dataset_cfg.TEST_BATCH_SIZE
         shuffle = False
 
-    transforms = build_transform(dataset_cfg.AUGMENTATION, mode)
+    transforms = build_transform(dataset_cfg.AUGMENTATION, mode=mode)
     dataset = build_dataset(dataset_cfg, mode=mode, transform=transforms)
     num_workers = dataset_cfg.LOADER_WORKERS
 

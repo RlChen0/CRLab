@@ -192,14 +192,18 @@ def train(cfg: CfgNode):
         valid_metrics.reset()
 
 
-if __name__ == '__main__':
-    arguments = docopt(__doc__, argv=None, help=True, version=None, options_first=False)
-    output_path = arguments['-o']
-    cfg_path = arguments['--cfg']
-    cfg = combine_cfgs(cfg_path)
-    cfg.OUTPUT_DIR = output_path
+def main():
+    parser = argparse.ArgumentParser(description='pytorch training')
+    parser.add_argument('-o', default='', help='output path', type=str)
+    parser.add_argument("--cfg", help='yaml config file path', type=str)
+    args = parser.parse_args()
+    cfg = combine_cfgs(args.cfg)
+    cfg.OUTPUT_DIR = args.o
     train(cfg)
 
+
+if __name__ == '__main__':
+    main()
 
 
 

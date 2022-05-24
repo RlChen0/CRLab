@@ -7,7 +7,7 @@ from src.modeling.head.build import build_head
 from .build import META_ARCH_REGISTRY
 
 
-@META_ARCH_REGISTRY.register('baseline')
+@META_ARCH_REGISTRY.register('baseline', build_model)
 def build_model(model_cfg: CfgNode) -> nn.Module:
     """
     Builds the baseline model using the CFGNode object,
@@ -16,6 +16,9 @@ def build_model(model_cfg: CfgNode) -> nn.Module:
     """
     # instantiate and return the BaselineModel using the configuration node
     return Model(model_cfg)
+
+
+
 
 
 class Model(nn.Module):
