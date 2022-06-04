@@ -22,12 +22,12 @@ def build_metric(metric_cfg: CfgNode, **kwargs) -> nn.Module:
 def build_optimizer(model: torch.nn.Module, opti_cfg: CfgNode) -> Optimizer:
     parameters = model.parameters()
     opti_type = opti_cfg.NAME
-    lr = opti_cfg.TARGET_LR
-    momentum = opti_cfg.MOMENTUM
     if opti_type == 'Adam' or 'adam':
-        optimizer = torch.optim.Adam(parameters, lr=lr)
+        adam_cfg = opti_cfg.ADAM
+        optimizer = torch.optim.Adam(parameters, lr=adam_cfg.TARGET_LR)
     elif opti_type == 'SGD' or 'sgd':
-        optimizer = torch.optim.SGD(parameters, lr=lr, momentum=momentum)
+        sgd_cfg = opti_cfg.SGD
+        optimizer = torch.optim.SGD(parameters, lr=sgd_cfg.TARGET_LR, momentum=sgd_cfg.MOMENTUM)
     else:
         raise Exception('invalid optimizer, available choices adam/sgd')
     return optimizer

@@ -1,7 +1,7 @@
 import os
 import warnings
 
-from dotenv import find_dotenv, load_dotenv
+
 from yacs.config import CfgNode as CN
 from pathlib import Path
 
@@ -34,7 +34,8 @@ _C.DATASET.LOADER_WORKERS = 1
 # MODELING
 ###################################################
 _C.MODEL = CN()
-_C.MODEL.META_ARCHITECTURE = 'baseline'
+_C.MODEL.META_ARCHITECTURE = CN()
+_C.MODEL.META_ARCHITECTURE.NAME = 'baseline'
 
 _C.MODEL.BACKBONE = CN()
 _C.MODEL.BACKBONE.NAME = 'resnet18'
@@ -50,8 +51,13 @@ _C.MODEL.HEAD.OUTPUT_DIMS = 176
 _C.SOLVER = CN()
 _C.SOLVER.OPTIMIZER = CN()
 _C.SOLVER.OPTIMIZER.NAME = "Adam"
-_C.SOLVER.OPTIMIZER.TARGET_LR = 0.001
-_C.SOLVER.OPTIMIZER.MOMENTUM = 0.9
+
+_C.SOLVER.OPTIMIZER.ADAM = CN()
+_C.SOLVER.OPTIMIZER.ADAM.TARGET_LR = 0.001
+
+_C.SOLVER.OPTIMIZER.SGD = CN()
+_C.SOLVER.OPTIMIZER.SGD.TARGET_LR = 0.001
+_C.SOLVER.OPTIMIZER.SGD.MOMENTUM = 0.9
 
 _C.SOLVER.MAX_EPOCHS = 50
 _C.SOLVER.MIN_EPOCHS = 10
@@ -68,32 +74,21 @@ _C.SOLVER.METRIC = CN()
 _C.SOLVER.METRIC.NAME = 'Accuracy'
 _C.SOLVER.METRIC.NUM_TARGETS = 10
 _C.SOLVER.METRIC.SUMMARIZE = True
+_C.SOLVER.CHECK_EPOCH = 1
 ####################################################
 _C.OUTPUT_DIR = ''
 _C.RESUME_PATH = ''
 
 def get_cfg_defaults():
-    """
-    Get a yacs CfgNode object with default values
-    """
-    # Return a clone so that the defaults will not be altered
-    # It will be subsequently overwritten with local YAML.
+
     return _C.clone()
 
 
-def combine_cfgs(path_cfg: Path = None):
-    """
-    An internal facing routine that at combined CFG in the order provided.
-    :param: path_cfg: path to path_cfg_data files
-    :return: cfg_base incorporating the override.
-    """
-    if path_cfg is not None:
-        path_cfg = Path(path_cfg)
+def combine_cfgs(cfg_path):
 
     cfg_base = get_cfg_defaults()
 
-    if path_cfg is not None and path_cfg.exists():
-        cfg_base.merge_from_file(path_cfg.absolute())
+    if cfg_path is not None and os.path.exists(cfg_path):
+        cfg_base.merge_from_file(cfg_path)
 
     return cfg_base
-

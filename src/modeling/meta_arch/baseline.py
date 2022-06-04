@@ -18,9 +18,6 @@ def build_baseline_model(model_cfg: CfgNode) -> nn.Module:
     return Model(model_cfg)
 
 
-
-
-
 class Model(nn.Module):
 
     def __init__(self, model_cfg: CfgNode):
